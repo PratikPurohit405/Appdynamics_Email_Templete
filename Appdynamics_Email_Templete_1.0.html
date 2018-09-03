@@ -1,0 +1,321 @@
+<p>
+#set($separator_Between_hostname_and_JVM='-')
+#set($Take_hostname_from_Health_Rule='0')
+#set($Take_hostname_from_Health_Rule_sparator='-')
+</p>
+
+<p>
+#set($Voliting_or_Not='1')
+#set($Non_std_alert='0')
+#set($event_message=${latestEvent.eventMessage})
+#set($HR_Name = ${latestEvent.incident.name})
+#set($Node_Name = ${latestEvent.node.name})
+</p>
+
+<p>
+#if(${latestEvent.severity}== 'WARN') 
+#set($severity_Text='Warning')  
+#set($severity_color='#f39c12')   
+#elseif(${latestEvent.severity}== 'ERROR')
+#set($severity_Text='Critical')     
+#set($severity_color='#FF0000')   
+#else     
+#set($severity_color='#2e7d32')
+#set($severity_Text='Closed')   
+#end   
+</p>
+
+
+<p>
+#if($eventmessage.toString().contains('no longer violating'))
+#set($Voliting_or_Not='0')
+#else
+#set($Voliting_or_Not='1') 
+#end 
+</p>
+
+
+<p>
+#if($HR_Name.toString().contains(${Take_hostname_from_Health_Rule_sparator}))
+#set($index15=${HR_Name.indexOf(${Take_hostname_from_Health_Rule_sparator})})
+#set($event_helth_name=${HR_Name.substring(0,$index15)})
+#set($index15=$index15 + 1)
+#set($index20=$HR_Name.length())
+#set($IP_HR=${HR_Name.substring($index15,${HR_Name.length()})})
+#else
+#set($event_helth_name=${HR_Name})
+#end
+</p>
+
+
+<p>
+#if($Node_Name.toString().contains(${separator_Between_hostname_and_JVM}) and $Take_hostname_from_Health_Rule.toString().contains('0'))
+		#set($index_of_under=${Node_Name.indexOf(${separator_Between_hostname_and_JVM})})
+		#set($index10=${Node_Name.indexOf(${separator_Between_hostname_and_JVM})})   	  
+        #set($index11=${Node_Name.indexOf(${separator_Between_hostname_and_JVM})})
+        #set($index12=$Node_Name.length())
+		#set($IP=${Node_Name.substring(0,$index10)})
+		#set($index10=$index10 + 1)   
+		#set($JVM=${Node_Name.substring($index10,$index12)})
+
+#else
+		#set($IP= ${latestEvent.node.name})
+		#set($JVM='')
+#end
+</p>
+
+
+<p>
+#if(!($IP.toString().contains('.'))  and $Take_hostname_from_Health_Rule.toString().contains('0'))
+    #if($IP_HR.toString().contains('.'))
+    #set($IP=$IP_HR)
+    #end
+#end
+</p>
+
+
+<p>
+#set($HRName = ${latestEvent.incident.name})   
+#set($LHRName = $HRName.length())   
+#set($IHRName = ${latestEvent.eventMessage.indexOf($HRName)})   
+#set($SMessage = $IHRName+$LHRName+5)   
+#set($Message = ${latestEvent.eventMessage.substring($SMessage,${latestEvent.eventMessage.indexOf('All of the following')})})   
+#set($MessageI1 = ${Message.indexOf('b')})   
+#set($MessageI11 = $MessageI1 + 2)   
+#set($MessageI12 = $MessageI1 - 1)   
+#set($SizeMessage = $Message.length())   
+#set($SizeMessage = $SizeMessage - 9)   
+#set($Message2 = ${Message.substring($MessageI11,$SizeMessage)})   
+#set($Message1 = ${Message.substring(0,$MessageI12)})
+#if($Message1 == 'started violating and is now ')
+#if($Message2 == 'critical')   
+#set($ViolateMsg = 'started violating with Critical Threshold')
+#elseif($Message2 == 'warning')   
+#set($ViolateMsg = 'started violating with Warning Threshold')
+#end
+#end
+#if($Message1 == 'continues to violate with ')
+#if($Message2 == 'critical')   
+#set($ViolateMsg = 'continues to violate with Critical Threshold')
+#elseif($Message2 == 'warning')   
+#set($ViolateMsg = 'continues to violate with Warning Threshold')
+#end
+#end
+#if($Message1 == 'upgraded in severity and is now ')   
+#set($ViolateMsg = 'upgraded from Warning to Critical')
+#end
+#if($Message1 == 'downgraded in severity and is now ')   
+#set($ViolateMsg = 'downgraded from Critical to Warning')
+#end  
+</p>  
+
+
+
+<p>   
+#if($event_message.toString().contains('CPU') || ($event_message.toString().contains('Memory') and !($event_message.toString().contains('Heap')) ) )   
+#set($Alert_type='OS')
+#set($IP_JVM=${IP}) 
+#elseif($HR_Name.toString().contains('Disk'))   
+#set($Alert_type='OS') 
+#set($IP_JVM=${IP})  
+#elseif($HR_Name.toString().contains('Agent Availability'))
+#set($Alert_type='AppDynamics') 
+#set($IP_JVM=${IP}) 
+#elseif($HR_Name.toString().contains('Process :'))
+#set($Alert_type='Synthetic Monitoring') 
+#set($IP_JVM=${IP})  
+#elseif($HR_Name.toString().contains('Process :'))
+#set($Alert_type='OS') 
+#set($IP_JVM=${IP})
+#elseif($HR_Name.toString().contains(': SQL') || $HR_Name.toString().contains('Connection Pool'))
+#set($Alert_type='DB') 
+#set($IP_JVM=${IP})     
+#else   
+#set($Alert_type='JVM') 
+#set($IP_JVM=${IP}+' '+${JVM}) 
+#end
+</p>
+
+<p>
+#if($event_message.toString().contains('Agent Availability') || ($event_message.toString().contains('Process :')) || ($event_message.toString().contains('Process :')) || ($event_message.toString().contains(': SQL')))   
+#set($Non_std_alert='1')
+#end
+</p>
+
+
+
+<div>
+    Dear Team,
+    <br>
+    <p>${event_helth_name} for server
+        <b>${IP_JVM}</b>
+        <b>${ViolateMsg}.</b>
+    </p>
+</div>
+
+
+
+<p>
+#if($Voliting_or_Not.toString().contains('0') and $Non_std_alert.toString().contains('0'))  
+</p>
+
+
+<table style="width: 100%;" bgcolor="#000000">
+    <tbody>
+        <tr style="height: 23px;">
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Status of Event</font></td>
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Alert Type</font></td>
+            <td bgcolor="#203764" style="width: 30%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Event name</font></td>
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Server name</font></td>
+            <td bgcolor="#203764" style="width: 30%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Time</font></td>
+        </tr>
+        <tr style="height: 23px;">
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;">&nbsp;<font color="${severity_color}" face="Bookman Old Style, Book Antiqua, Garamond"><span>${severity_Text}</span></font></td>
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond">${Alert_type}</font></td>
+            <td bgcolor="#ffffff" style="width: 30%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond">${event_helth_name}</font></td>
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond">${IP_JVM}</font></td>
+            <td bgcolor="#ffffff" style="width: 30%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond">${latestEvent.eventTime}</font></td>
+        </tr>
+    </tbody>
+</table>
+
+
+<p>
+#elseif($Non_std_alert.toString().contains('1'))
+
+
+#if(!($severity_Text.toString().contains('Closed')) and ($event_message.toString().contains(': SQL')) )
+    #set($index10 =${latestEvent.eventMessage.indexOf('minutes')})   
+    #set($index9 = $index9 + 4)   
+    #set($Eval_Period =${latestEvent.eventMessage.substring($index9,$index10)})   
+    #set($index3 =${latestEvent.eventMessage.indexOf('threshold')})   
+    #set($index4 =${latestEvent.eventMessage.indexOf('for the last')})   
+    #set($index3 = $index3 + 9)   
+    #set($Threshould_value =${latestEvent.eventMessage.substring($index3,$index4)})   
+    #set($index3 =${latestEvent.eventMessage.indexOf('value')})   
+    #set($index4 =${latestEvent.eventMessage.indexOf('was')})   
+    #set($index3 = $index3 + 5)   
+    #set($Current_Value =${latestEvent.eventMessage.substring($index3,$index4)}) 
+    #if($event_message.toString().contains('[unit='))
+        #set($index1=${event_message.indexOf('[unit=')})
+        #set($index2=${event_message.indexOf(']')})
+        #set($index1= $index1 + 6)
+        #set($index2= $index2)
+        #set($unit=${event_message.substring($index1,$index2)})
+    #else
+        #set($unit='')
+    #end
+#elseif(!($event_message.toString().contains(': SQL')) and $eventmessage.toString().contains('no longer violating'))
+#set($Current_Value='Working')
+#else
+#set($Current_Value='Down')
+#end
+
+
+#if($Take_hostname_from_Health_Rule.toString().contains('1'))
+#set($IP_JVM=$IP_HR)
+#end
+
+
+</p>
+<table style="width: 100%;" bgcolor="#000000">
+    <tbody>
+        <tr style="height: 23px;">
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Severity</font></td>
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Alert Type</font></td>
+            <td bgcolor="#203764" style="width: 30%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Event name</font></td>
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Server name</font></td>
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Status</font></td>
+            <td bgcolor="#203764" style="width: 30%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Time</font></td>
+        </tr>
+        <tr style="height: 23px;">
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond" color="${severity_color}"><span>${severity_Text}</span></font></td>
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond">${Alert_type}</font></td>
+            <td bgcolor="#ffffff" style="width: 30%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond">${event_helth_name}</font></td>
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond">${IP_JVM}</font></td>
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond" color="${severity_color}">${Current_Value} ${unit}</font></td>
+            <td bgcolor="#ffffff" style="width: 30%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond">${latestEvent.eventTime}</font></td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+
+<p>#{else} </p>
+
+<p>
+
+#set($index9 =${latestEvent.eventMessage.indexOf('last')})   
+#set($index10 =${latestEvent.eventMessage.indexOf('minutes')})   
+#set($index9 = $index9 + 4)   
+#set($Eval_Period =${latestEvent.eventMessage.substring($index9,$index10)})   
+#set($index3 =${latestEvent.eventMessage.indexOf('threshold')})   
+#set($index4 =${latestEvent.eventMessage.indexOf('for the last')})   
+#set($index3 = $index3 + 9)   
+#set($Threshould_value =${latestEvent.eventMessage.substring($index3,$index4)})   
+#set($index3 =${latestEvent.eventMessage.indexOf('value')})   
+#set($index4 =${latestEvent.eventMessage.indexOf('was')})   
+#set($index3 = $index3 + 5)   
+#set($Current_Value =${latestEvent.eventMessage.substring($index3,$index4)}) 
+
+
+
+
+#if($event_message.toString().contains('[unit='))
+#set($index1=${event_message.indexOf('[unit=')})
+#set($index2=${event_message.indexOf(']')})
+#set($index1= $index1 + 6)
+#set($index2= $index2)
+#set($unit=${event_message.substring($index1,$index2)})
+#else
+#set($unit='')
+#end
+
+
+#if($Take_hostname_from_Health_Rule.toString().contains('1'))
+#set($IP=$IP_HR)
+#end
+
+
+
+</p>
+
+
+
+<table style="width: 100%;" bgcolor="#000000">
+    <tbody>
+        <tr style="height: 23px;">
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Severity</font></td>
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Alert Type</font></td>
+            <td bgcolor="#203764" style="width: 30%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Event name</font></td>
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Server name</font></td>
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Average value for last ${Eval_Period} min</font></td>
+            <td bgcolor="#203764" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Threshold</font></td>
+            <td bgcolor="#203764" style="width: 30%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond" color="white">&nbsp;Time</font></td>
+        </tr>
+        <tr style="height: 23px;">
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond" color="${severity_color}"><span>${severity_Text}</span></font></td>
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond">${Alert_type}</font></td>
+            <td bgcolor="#ffffff" style="width: 30%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond">${event_helth_name}</font></td>
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;"><font face="Bookman Old Style, Book Antiqua, Garamond">${IP_JVM}</font></td>
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond" color="${severity_color}">${Current_Value} ${unit}</font></td>
+            <td bgcolor="#ffffff" style="width: 10%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond">${Threshould_value} ${unit}</font></td>
+            <td bgcolor="#ffffff" style="width: 30%;height: 23px;text-align: center;">&nbsp;<font face="Bookman Old Style, Book Antiqua, Garamond">${latestEvent.eventTime}</font></td>
+        </tr>
+    </tbody>
+</table>
+
+
+<br>
+<br>
+<div>
+    <strong>Thanks and Regards </strong>
+    <br>
+    <strong>    APM Team</strong>
+</div>
+
+<p>
+    #{end}
+</p>
