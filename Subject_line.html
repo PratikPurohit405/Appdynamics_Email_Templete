@@ -1,0 +1,9 @@
+${latestEvent.application.name} | ${latestEvent.incident.name} |   
+#set($eventmessage=${latestEvent.eventMessage}) 
+#set($message1=${latestEvent.severityImage.name.substring(3,${latestEvent.severityImage.name.indexOf('_small')})}) 
+#if($eventmessage.toString().contains('no longer violating')) Closed 
+#elseif($eventmessage.toString().contains('started')) ${message1} 
+#elseif($eventmessage.toString().contains('continues')) Continues ${message1}  
+#elseif($eventmessage.toString().contains('upgraded')) Upgraded to ${message1}   
+#else Downgraded to ${message1}  
+#end
