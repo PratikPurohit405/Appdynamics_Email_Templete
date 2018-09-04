@@ -10,6 +10,7 @@ This Email Template is design to work with below health Rules :
 3.	Process Monitoring
 4.	URL Monitoring
 5.	SQL Monitoring 
+
 This template is design and develop in order to save time in creation and maintaining of multiple Health Rules. 
 
 ## *Pre-Requisite:*
