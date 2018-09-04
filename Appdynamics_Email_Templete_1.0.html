@@ -1,5 +1,5 @@
 <p>
-#set($separator_Between_hostname_and_JVM='-')
+#set($separator_Between_hostname_and_JVM='_')
 #set($Take_hostname_from_Health_Rule='0')
 #set($Take_hostname_from_Health_Rule_sparator='-')
 </p>
@@ -124,7 +124,7 @@
 #elseif($HR_Name.toString().contains('Process :'))
 #set($Alert_type='Synthetic Monitoring') 
 #set($IP_JVM=${IP})  
-#elseif($HR_Name.toString().contains('Process :'))
+#elseif($HR_Name.toString().contains('Page :'))
 #set($Alert_type='OS') 
 #set($IP_JVM=${IP})
 #elseif($HR_Name.toString().contains(': SQL') || $HR_Name.toString().contains('Connection Pool'))
@@ -137,7 +137,7 @@
 </p>
 
 <p>
-#if($event_message.toString().contains('Agent Availability') || ($event_message.toString().contains('Process :')) || ($event_message.toString().contains('Process :')) || ($event_message.toString().contains(': SQL')))   
+#if($event_message.toString().contains('Agent Availability') || ($event_message.toString().contains('Page :')) || ($event_message.toString().contains('Process :')) || ($event_message.toString().contains(': SQL')))   
 #set($Non_std_alert='1')
 #end
 </p>
@@ -207,8 +207,10 @@
     #end
 #elseif(!($event_message.toString().contains(': SQL')) and $eventmessage.toString().contains('no longer violating'))
 #set($Current_Value='Working')
+#set($unit='')
 #else
 #set($Current_Value='Down')
+#set($unit='')
 #end
 
 
