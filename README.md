@@ -1,8 +1,8 @@
-Appdynamics Email Template
+#**Appdynamics Email Template**
 
-Requirement: - One Template for One application.
+## *Requirement: -* One Template for One application.
 
-Description: 
+## *Description:*
   
 This Email Template is design to work with below health Rules :
 1.	Infra Alerts (CPU, Memory, Heap, GC, Connection pool, Threads, Disk )
@@ -12,7 +12,7 @@ This Email Template is design to work with below health Rules :
 5.	SQL Monitoring 
 This template is design and develop in order to save time in creation and maintaining of multiple Health Rules. 
 
-Pre-Requisite: 
+## *Pre-Requisite:*
 
 •	Health Rule :
 1.	Recommended to use one Health rule of one type for all the nodes (e.g. Memory utilization of all nodes should be in one HR).
@@ -37,7 +37,7 @@ This variable is used take IP from health rule. If you want to get IP from your 
 If you desperately want to take IP from health rule and not from node then this variable come into the picture.
 Default value for this variable is ‘0’ if you want to take IP from HR then change it to ‘1’
  
-Conditions
+## *Conditions*
 1.	Case 1 - Node name contains IP also HR name contains IP 
 In the above case Template will take IP from Node name.
 2.	Case 2 – Node name contain hostname and HR name contain IP
@@ -48,14 +48,14 @@ In this case first hostname will be saved in one variable and then it will check
 For above case it will simply take IP from HR name and does not look for node name. 
 Note: - If HR name does not contain IP then Template will fail, Hence suggested to set this variable when User desperately want IP to be parse from HR Name.
 
-Known Issues
+## *Known Issues*
 1.	Template fail if u set HR on baseline.
 
-Design and Developed by 
+## *Design and Developed by* 
 1.	Pratik Purohit
 2.	Namrata Adavkar
 
-Reviewed By 
+## *Reviewed By*
 1.	Swathi Iyer
 2.	Hitesh Paunikar 
 
