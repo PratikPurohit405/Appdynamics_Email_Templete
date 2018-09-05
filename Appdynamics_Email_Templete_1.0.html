@@ -1,9 +1,9 @@
+
 <p>
-#set($separator_Between_hostname_and_JVM='_')
+#set($separator_Between_hostname_and_JVM='-')
 #set($Take_hostname_from_Health_Rule='0')
 #set($Take_hostname_from_Health_Rule_sparator='-')
 </p>
-
 <p>
 #set($Voliting_or_Not='1')
 #set($Non_std_alert='0')
@@ -11,6 +11,7 @@
 #set($HR_Name = ${latestEvent.incident.name})
 #set($Node_Name = ${latestEvent.node.name})
 </p>
+
 
 <p>
 #if(${latestEvent.severity}== 'WARN') 
@@ -33,6 +34,8 @@
 #set($Voliting_or_Not='1') 
 #end 
 </p>
+
+
 
 
 <p>
@@ -73,43 +76,19 @@
 #end
 </p>
 
-
 <p>
-#set($HRName = ${latestEvent.incident.name})   
-#set($LHRName = $HRName.length())   
-#set($IHRName = ${latestEvent.eventMessage.indexOf($HRName)})   
-#set($SMessage = $IHRName+$LHRName+5)   
-#set($Message = ${latestEvent.eventMessage.substring($SMessage,${latestEvent.eventMessage.indexOf('All of the following')})})   
-#set($MessageI1 = ${Message.indexOf('b')})   
-#set($MessageI11 = $MessageI1 + 2)   
-#set($MessageI12 = $MessageI1 - 1)   
-#set($SizeMessage = $Message.length())   
-#set($SizeMessage = $SizeMessage - 9)   
-#set($Message2 = ${Message.substring($MessageI11,$SizeMessage)})   
-#set($Message1 = ${Message.substring(0,$MessageI12)})
-#if($Message1 == 'started violating and is now ')
-#if($Message2 == 'critical')   
-#set($ViolateMsg = 'started violating with Critical Threshold')
-#elseif($Message2 == 'warning')   
-#set($ViolateMsg = 'started violating with Warning Threshold')
+#if($event_message.toString().contains('started violating'))
+#set($ViolateMsg='started violating with '+${severity_Text}+' Threshold')
+#elseif($event_message.toString().contains('continues to violate'))
+#set($ViolateMsg='continues to violate with '+${severity_Text}+' Threshold')
+#elseif($event_message.toString().contains('downgraded in severity'))
+#set($ViolateMsg='downgraded from Critical to Warning')
+#elseif($event_message.toString().contains('upgraded in severity'))
+#set($ViolateMsg='upgraded from Warning to Critical')
+#else
+#set($ViolateMsg='Closed')
 #end
-#end
-#if($Message1 == 'continues to violate with ')
-#if($Message2 == 'critical')   
-#set($ViolateMsg = 'continues to violate with Critical Threshold')
-#elseif($Message2 == 'warning')   
-#set($ViolateMsg = 'continues to violate with Warning Threshold')
-#end
-#end
-#if($Message1 == 'upgraded in severity and is now ')   
-#set($ViolateMsg = 'upgraded from Warning to Critical')
-#end
-#if($Message1 == 'downgraded in severity and is now ')   
-#set($ViolateMsg = 'downgraded from Critical to Warning')
-#end  
-</p>  
-
-
+</p>
 
 <p>   
 #if($event_message.toString().contains('CPU') || ($event_message.toString().contains('Memory') and !($event_message.toString().contains('Heap')) ) )   
@@ -118,13 +97,13 @@
 #elseif($HR_Name.toString().contains('Disk'))   
 #set($Alert_type='OS') 
 #set($IP_JVM=${IP})  
-#elseif($HR_Name.toString().contains('Agent Availability'))
+#elseif($HR_Name.toString().contains('Agent Avilability'))
 #set($Alert_type='AppDynamics') 
 #set($IP_JVM=${IP}) 
 #elseif($HR_Name.toString().contains('Process :'))
 #set($Alert_type='Synthetic Monitoring') 
 #set($IP_JVM=${IP})  
-#elseif($HR_Name.toString().contains('Page :'))
+#elseif($HR_Name.toString().contains('Process :'))
 #set($Alert_type='OS') 
 #set($IP_JVM=${IP})
 #elseif($HR_Name.toString().contains(': SQL') || $HR_Name.toString().contains('Connection Pool'))
@@ -137,7 +116,7 @@
 </p>
 
 <p>
-#if($event_message.toString().contains('Agent Availability') || ($event_message.toString().contains('Page :')) || ($event_message.toString().contains('Process :')) || ($event_message.toString().contains(': SQL')))   
+#if($event_message.toString().contains('Agent Avilability') || ($event_message.toString().contains('Process :')) || ($event_message.toString().contains('Process :')) || ($event_message.toString().contains(': SQL')))   
 #set($Non_std_alert='1')
 #end
 </p>
@@ -207,10 +186,8 @@
     #end
 #elseif(!($event_message.toString().contains(': SQL')) and $eventmessage.toString().contains('no longer violating'))
 #set($Current_Value='Working')
-#set($unit='')
 #else
 #set($Current_Value='Down')
-#set($unit='')
 #end
 
 
@@ -321,3 +298,4 @@
 <p>
     #{end}
 </p>
+
