@@ -1,6 +1,6 @@
 
 <p>
-#set($separator_Between_hostname_and_JVM='-')
+#set($separator_Between_hostname_and_JVM='_')
 #set($Take_hostname_from_Health_Rule='0')
 #set($Take_hostname_from_Health_Rule_sparator='-')
 </p>
@@ -285,7 +285,9 @@
         </tr>
     </tbody>
 </table>
-
+<p>
+    #{end}
+</p>
 
 <br>
 <br>
@@ -295,7 +297,5 @@
     <strong>    APM Team</strong>
 </div>
 
-<p>
-    #{end}
-</p>
+
 
