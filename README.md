@@ -50,7 +50,7 @@ For above case it will simply take IP from HR name and does not look for node na
 Note: - If HR name does not contain IP then Template will fail, Hence suggested to set this variable when User desperately want IP to be parse from HR Name.
 
 ## *Known Issues*
-1.	Template fail if u set HR on baseline.
+1.	Template fail if HR set on baseline.
 
 ## *Design and Developed by* 
 1.	Pratik Purohit
