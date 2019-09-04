@@ -49,9 +49,6 @@ In this case first hostname will be saved in one variable and then it will check
 For above case it will simply take IP from HR name and does not look for node name. 
 Note: - If HR name does not contain IP then Template will fail, Hence suggested to set this variable when User desperately want IP to be parse from HR Name.
 
-## *Known Issues*
-1.	Template fail if HR set on baseline.
-
 ## *Design and Developed by* 
 1.	Pratik Purohit
 2.	Namrata Adavkar
